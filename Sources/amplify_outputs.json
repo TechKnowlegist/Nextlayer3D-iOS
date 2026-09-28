@@ -1,0 +1,74 @@
+{
+  "auth": {
+    "user_pool_id": "us-east-1_VEYbEth4g",
+    "aws_region": "us-east-1",
+    "user_pool_client_id": "5269d81gnu8skf49c854ho6pb5",
+    "identity_pool_id": "us-east-1:6883c9e9-f661-4604-a719-b95be82884d2",
+    "mfa_methods": [],
+    "standard_required_attributes": [
+      "email"
+    ],
+    "username_attributes": [
+      "email"
+    ],
+    "user_verification_types": [
+      "email"
+    ],
+    "groups": [],
+    "mfa_configuration": "NONE",
+    "password_policy": {
+      "min_length": 8,
+      "require_lowercase": true,
+      "require_numbers": true,
+      "require_symbols": true,
+      "require_uppercase": true
+    },
+    "unauthenticated_identities_enabled": true
+  },
+  "data": {
+    "url": "https://lrug6qpknrb7hhdho5x3gypiuq.appsync-api.us-east-1.amazonaws.com/graphql",
+    "aws_region": "us-east-1",
+    "default_authorization_type": "AMAZON_COGNITO_USER_POOLS",
+    "authorization_types": [
+      "AWS_IAM"
+    ]
+  },
+  "storage": {
+    "aws_region": "us-east-1",
+    "bucket_name": "amplify-tasker-gavin-sand-nextlayerbuildplatemodel-hdnumc2qbp8x",
+    "buckets": [
+      {
+        "name": "nextlayerBuildPlateModels",
+        "bucket_name": "amplify-tasker-gavin-sand-nextlayerbuildplatemodel-hdnumc2qbp8x",
+        "aws_region": "us-east-1",
+        "paths": {
+          "model-uploads/*": {
+            "guest": [
+              "get",
+              "list"
+            ],
+            "authenticated": [
+              "get",
+              "list",
+              "write",
+              "delete"
+            ]
+          },
+          "printer-images/*": {
+            "guest": [
+              "get",
+              "list"
+            ],
+            "authenticated": [
+              "get",
+              "list",
+              "write",
+              "delete"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "version": "1.5"
+}

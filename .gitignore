@@ -1,0 +1,16 @@
+# XcodeGen-generated project — regenerated from project.yml, never hand-edited
+*.xcodeproj/
+*.xcworkspace/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Xcode user state
+xcuserdata/
+DerivedData/
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+
+.DS_Store

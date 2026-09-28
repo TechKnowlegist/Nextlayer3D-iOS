@@ -1,0 +1,51 @@
+name: Nextlayer3D
+options:
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    CODE_SIGN_STYLE: Automatic
+    TARGETED_DEVICE_FAMILY: "1"
+packages:
+  Amplify:
+    url: https://github.com/aws-amplify/amplify-swift
+    from: "2.30.0"
+  StripeSDK:
+    url: https://github.com/stripe/stripe-ios
+    from: "23.0.0"
+targets:
+  Nextlayer3D:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Sources
+        excludes:
+          - Info.plist
+    info:
+      path: Sources/Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nextlayer3d.app
+    dependencies:
+      - package: Amplify
+        product: Amplify
+      - package: Amplify
+        product: AWSCognitoAuthPlugin
+      - package: Amplify
+        product: AWSAPIPlugin
+      - package: Amplify
+        product: AWSS3StoragePlugin
+      - package: StripeSDK
+        product: StripePaymentSheet
+schemes:
+  Nextlayer3D:
+    build:
+      targets:
+        Nextlayer3D: all
+    run:
+      config: Debug
+    archive:
+      config: Release
