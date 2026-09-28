@@ -42,6 +42,8 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             -sdk iphonesimulator \
             -derivedDataPath DerivedData \
+            -skipPackagePluginValidation \
+            -skipMacroValidation \
             CODE_SIGNING_ALLOWED=NO \
             build
 
