@@ -9,18 +9,24 @@ on:
 
 jobs:
   build-simulator:
-    # Pinned to a specific macOS version (not "latest") so the runner
-    # image itself doesn't silently drift over time. Xcode is deliberately
-    # NOT pinned here: `brew install xcodegen` always installs the latest
-    # XcodeGen, which generates project files in whatever pbxproj format
-    # its own release targets — pinning to an older Xcode than that
-    # produces "future Xcode project file format" errors (hit exactly this
-    # on the first run, pinned to 15.4). The runner's own default Xcode is
-    # kept reasonably current by GitHub, so it's a better match for
-    # brew's always-latest XcodeGen than a version guessed here.
-    runs-on: macos-14
+    # macos-14's own default Xcode turned out to be 15.4, which can't read
+    # the pbxproj format brew's always-latest XcodeGen writes ("future
+    # Xcode project file format (77)" — hit on two prior runs). macos-15
+    # ships a newer Xcode by default, which is a better match for that.
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+
+      - name: List available Xcode versions
+        run: ls -d /Applications/Xcode*.app
+
+      - name: Select the newest available Xcode
+        run: |
+          NEWEST=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -n1)
+          if [ -z "$NEWEST" ]; then NEWEST=/Applications/Xcode.app; fi
+          echo "Selecting $NEWEST"
+          sudo xcode-select -s "$NEWEST/Contents/Developer"
+          xcodebuild -version
 
       - name: Install XcodeGen
         run: brew install xcodegen
@@ -35,5 +41,40 @@ jobs:
             -scheme Nextlayer3D \
             -destination 'generic/platform=iOS Simulator' \
             -sdk iphonesimulator \
+            -derivedDataPath DerivedData \
             CODE_SIGNING_ALLOWED=NO \
             build
+
+      # Everything below actually launches the built app against the real
+      # AWS backend (same Cognito/AppSync/S3 the website uses — GitHub's
+      # runners have real internet access) and screenshots it, so there's
+      # something to actually look at without needing a Mac, an Apple
+      # Developer account, or any signing.
+      - name: Boot a simulator
+        run: |
+          DEVICE_ID=$(xcrun simctl list devices available | grep -m1 "iPhone" | grep -oE '[0-9A-F-]{36}')
+          echo "Using simulator $DEVICE_ID"
+          echo "DEVICE_ID=$DEVICE_ID" >> "$GITHUB_ENV"
+          xcrun simctl boot "$DEVICE_ID"
+          xcrun simctl bootstatus "$DEVICE_ID" -b
+
+      - name: Install and launch the app
+        run: |
+          APP_PATH=$(find DerivedData -name "Nextlayer3D.app" -path "*iphonesimulator*" | head -n1)
+          echo "Installing $APP_PATH"
+          xcrun simctl install "$DEVICE_ID" "$APP_PATH"
+          xcrun simctl launch "$DEVICE_ID" com.nextlayer3d.app
+          sleep 10
+
+      - name: Screenshot the running app
+        run: |
+          mkdir -p screenshots
+          xcrun simctl io "$DEVICE_ID" screenshot screenshots/app-launch.png
+
+      - name: Upload screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-screenshot
+          path: screenshots/
+          if-no-files-found: ignore
