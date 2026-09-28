@@ -9,17 +9,18 @@ on:
 
 jobs:
   build-simulator:
-    # Pinned to a specific macOS version (not "latest") so the available
-    # Xcode versions — and therefore this build — don't silently drift
-    # over time.
+    # Pinned to a specific macOS version (not "latest") so the runner
+    # image itself doesn't silently drift over time. Xcode is deliberately
+    # NOT pinned here: `brew install xcodegen` always installs the latest
+    # XcodeGen, which generates project files in whatever pbxproj format
+    # its own release targets — pinning to an older Xcode than that
+    # produces "future Xcode project file format" errors (hit exactly this
+    # on the first run, pinned to 15.4). The runner's own default Xcode is
+    # kept reasonably current by GitHub, so it's a better match for
+    # brew's always-latest XcodeGen than a version guessed here.
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
-
-      - name: Select Xcode 15.4
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: "15.4"
 
       - name: Install XcodeGen
         run: brew install xcodegen
