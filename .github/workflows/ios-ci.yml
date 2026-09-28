@@ -34,13 +34,33 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
+      # A concrete device, not just "generic/platform=iOS Simulator" — the
+      # generic destination is documented to break aws-sdk-swift's
+      # SmithyCodeGeneratorPlugin (it builds a host-side CLI tool as part
+      # of code generation, and its output lands somewhere the generic/
+      # archive-style build doesn't look — see awslabs/aws-sdk-swift#2224
+      # for the same underlying UninstalledProducts-path issue on a
+      # different generic-style build). Building against a real device,
+      # same as any normal "hit Run in Xcode" flow, avoids it.
+      - name: Pick a simulator device
+        run: |
+          DEVICE_NAME=$(xcrun simctl list devices available | grep -m1 -oE "^\s*iPhone [^(]+" | sed -e 's/^ *//' -e 's/ *$//')
+          DEVICE_ID=$(xcrun simctl list devices available | grep -m1 "$DEVICE_NAME (" | grep -oE '[0-9A-F-]{36}')
+          echo "Using simulator: $DEVICE_NAME ($DEVICE_ID)"
+          echo "DEVICE_NAME=$DEVICE_NAME" >> "$GITHUB_ENV"
+          echo "DEVICE_ID=$DEVICE_ID" >> "$GITHUB_ENV"
+
+      - name: Boot the simulator
+        run: |
+          xcrun simctl boot "$DEVICE_ID"
+          xcrun simctl bootstatus "$DEVICE_ID" -b
+
       - name: Build for iOS Simulator
         run: |
           xcodebuild \
             -project Nextlayer3D.xcodeproj \
             -scheme Nextlayer3D \
-            -destination 'generic/platform=iOS Simulator' \
-            -sdk iphonesimulator \
+            -destination "platform=iOS Simulator,name=$DEVICE_NAME" \
             -derivedDataPath DerivedData \
             -skipPackagePluginValidation \
             -skipMacroValidation \
@@ -52,13 +72,6 @@ jobs:
       # runners have real internet access) and screenshots it, so there's
       # something to actually look at without needing a Mac, an Apple
       # Developer account, or any signing.
-      - name: Boot a simulator
-        run: |
-          DEVICE_ID=$(xcrun simctl list devices available | grep -m1 "iPhone" | grep -oE '[0-9A-F-]{36}')
-          echo "Using simulator $DEVICE_ID"
-          echo "DEVICE_ID=$DEVICE_ID" >> "$GITHUB_ENV"
-          xcrun simctl boot "$DEVICE_ID"
-          xcrun simctl bootstatus "$DEVICE_ID" -b
 
       - name: Install and launch the app
         run: |
