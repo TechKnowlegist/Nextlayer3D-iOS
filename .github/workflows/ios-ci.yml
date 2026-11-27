@@ -7,6 +7,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-simulator:
     # macos-14's own default Xcode turned out to be 15.4, which can't read
@@ -93,3 +96,98 @@ jobs:
           name: app-screenshot
           path: screenshots/
           if-no-files-found: ignore
+
+  # Builds a real, installable .ipa for a physical iPhone (not the
+  # Simulator). It's deliberately left UNSIGNED — no Apple Developer
+  # account or certificate involved. AltStore does its own signing (using
+  # your free personal Apple ID) at install time, so an unsigned .ipa is
+  # exactly what it expects. On every push to main, the .ipa and an
+  # AltStore "source" JSON are published to a rolling "latest" GitHub
+  # Release, so AltStore on your phone can see new builds as they land.
+  build-device-ipa:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select the newest available Xcode
+        run: |
+          NEWEST=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -n1)
+          if [ -z "$NEWEST" ]; then NEWEST=/Applications/Xcode.app; fi
+          sudo xcode-select -s "$NEWEST/Contents/Developer"
+          xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build unsigned app for a real iPhone
+        run: |
+          xcodebuild \
+            -project Nextlayer3D.xcodeproj \
+            -scheme Nextlayer3D \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -derivedDataPath DerivedData \
+            -skipPackagePluginValidation \
+            -skipMacroValidation \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Package the .app into an .ipa
+        run: |
+          APP_PATH=$(find DerivedData -name "Nextlayer3D.app" -path "*iphoneos*" | head -n1)
+          echo "Packaging $APP_PATH"
+          mkdir -p Payload
+          cp -R "$APP_PATH" Payload/
+          zip -r -q Nextlayer3D.ipa Payload
+          echo "IPA_SIZE=$(stat -f%z Nextlayer3D.ipa)" >> "$GITHUB_ENV"
+
+      - name: Upload .ipa as a build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Nextlayer3D-ipa
+          path: Nextlayer3D.ipa
+
+      - name: Write the AltStore source feed
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          cat > altstore-source.json <<EOF
+          {
+            "name": "Nextlayer3D",
+            "identifier": "com.nextlayer3d.altstore-source",
+            "apps": [
+              {
+                "name": "Nextlayer3D",
+                "bundleIdentifier": "com.nextlayer3d.app",
+                "developerName": "TechKnowlegist",
+                "version": "${GITHUB_SHA::7}",
+                "versionDate": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+                "versionDescription": "Automatic build from commit ${GITHUB_SHA::7}.",
+                "downloadURL": "https://github.com/${GITHUB_REPOSITORY}/releases/download/latest/Nextlayer3D.ipa",
+                "localizedDescription": "Native iPhone companion app for Nextlayer3D — Phase 1 (core commerce).",
+                "size": ${IPA_SIZE}
+              }
+            ]
+          }
+          EOF
+
+      - name: Publish to the rolling "latest" release
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest build
+          body: >
+            Automatically rebuilt from the latest commit on main. This is an
+            unsigned .ipa — install or update it through AltStore using the
+            source feed URL in SETUP.md, not by downloading it directly.
+          make_latest: true
+          files: |
+            Nextlayer3D.ipa
+            altstore-source.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
