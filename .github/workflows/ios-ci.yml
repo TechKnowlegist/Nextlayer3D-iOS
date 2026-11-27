@@ -135,6 +135,7 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
+            MARKETING_VERSION="${GITHUB_SHA::7}" \
             build
 
       - name: Package the .app into an .ipa
