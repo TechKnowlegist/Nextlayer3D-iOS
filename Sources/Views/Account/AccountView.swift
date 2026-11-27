@@ -30,6 +30,12 @@ private struct SignedInAccountView: View {
                 }
             }
 
+            Section {
+                NavigationLink("Track an Order") {
+                    TrackOrderView()
+                }
+            }
+
             Section("Saved Addresses") {
                 if isLoading {
                     ProgressView()

@@ -18,6 +18,8 @@ struct Nextlayer3DApp: App {
             RootView()
                 .environmentObject(session)
                 .environmentObject(cart)
+                .preferredColorScheme(.dark)
+                .tint(AccentColors.nlGreen)
                 .task {
                     await session.refresh()
                 }
