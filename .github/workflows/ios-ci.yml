@@ -139,6 +139,20 @@ jobs:
             CURRENT_PROJECT_VERSION="${GITHUB_RUN_NUMBER}" \
             build
 
+      # The MARKETING_VERSION build setting above didn't actually reach the
+      # compiled Info.plist (verified by downloading a build of the sibling
+      # blind-box-games app and inspecting it — it still read "1.0"), so
+      # AltStore kept rejecting the install as a version mismatch. Stamping
+      # the already-built .app's Info.plist directly can't be silently
+      # overridden by whatever Xcode does internally.
+      - name: Stamp the build with a version matching the AltStore feed
+        run: |
+          APP_PATH=$(find DerivedData -name "Nextlayer3D.app" -path "*iphoneos*" | head -n1)
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${GITHUB_SHA::7}" "$APP_PATH/Info.plist"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${GITHUB_RUN_NUMBER}" "$APP_PATH/Info.plist"
+          echo "Stamped version:"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP_PATH/Info.plist"
+
       - name: Package the .app into an .ipa
         run: |
           APP_PATH=$(find DerivedData -name "Nextlayer3D.app" -path "*iphoneos*" | head -n1)
