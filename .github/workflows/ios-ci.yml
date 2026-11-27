@@ -169,6 +169,7 @@ jobs:
                 "versionDescription": "Automatic build from commit ${GITHUB_SHA::7}.",
                 "downloadURL": "https://github.com/${GITHUB_REPOSITORY}/releases/download/latest/Nextlayer3D.ipa",
                 "localizedDescription": "Native iPhone companion app for Nextlayer3D — Phase 1 (core commerce).",
+                "iconURL": "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/icon.png",
                 "size": ${IPA_SIZE}
               }
             ]
