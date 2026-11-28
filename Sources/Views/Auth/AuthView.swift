@@ -44,6 +44,7 @@ struct AuthView: View {
                 Button(primaryButtonTitle) {
                     Task { await primaryAction() }
                 }
+                .buttonStyle(.glassProminent)
                 .disabled(isLoading)
             }
 

@@ -41,7 +41,7 @@ struct ProductDetailView: View {
                         didAdd = true
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { didAdd = false }
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.glassProminent)
                     .frame(maxWidth: .infinity)
                 }
             }

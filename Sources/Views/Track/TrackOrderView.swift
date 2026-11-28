@@ -14,6 +14,7 @@ struct TrackOrderView: View {
                 Button("Track Order") {
                     Task { await lookUp() }
                 }
+                .buttonStyle(.glassProminent)
                 .disabled(orderNumber.isEmpty || isLoading)
             }
 

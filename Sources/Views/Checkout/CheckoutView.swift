@@ -49,11 +49,12 @@ struct CheckoutView: View {
                         Text("Pay \(String(format: "$%.2f", cart.total))")
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.glassProminent)
                 } else {
                     Button(isPreparingPayment ? "Preparing payment…" : "Continue to Payment") {
                         Task { await preparePayment() }
                     }
+                    .buttonStyle(.glassProminent)
                     .disabled(isPreparingPayment || !formIsValid)
                 }
             }

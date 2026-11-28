@@ -1,7 +1,7 @@
 name: Nextlayer3D
 options:
   deploymentTarget:
-    iOS: "17.0"
+    iOS: "26.0"
   createIntermediateGroups: true
 settings:
   base:
@@ -19,7 +19,7 @@ targets:
   Nextlayer3D:
     type: application
     platform: iOS
-    deploymentTarget: "17.0"
+    deploymentTarget: "26.0"
     sources:
       - path: Sources
         excludes:

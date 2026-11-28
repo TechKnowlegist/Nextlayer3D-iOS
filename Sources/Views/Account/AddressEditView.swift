@@ -35,6 +35,7 @@ struct AddressEditView: View {
             Button(isSaving ? "Saving…" : "Save Address") {
                 Task { await save() }
             }
+            .buttonStyle(.glassProminent)
             .disabled(isSaving || !formIsValid)
         }
         .navigationTitle("New Address")
