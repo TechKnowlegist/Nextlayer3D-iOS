@@ -8,29 +8,34 @@ import SwiftUI
 struct AdminHomeView: View {
     let access: AdminAccess
 
+    private enum Destination {
+        case products, orders, notBuilt
+    }
+
     private struct AdminSection: Identifiable {
         let id = UUID()
         let title: String
         let icon: String
+        let destination: Destination
     }
 
     private var sections: [AdminSection] {
         let moderation = [
-            AdminSection(title: "Build Plate", icon: "square.stack"),
-            AdminSection(title: "Reports", icon: "flag"),
+            AdminSection(title: "Build Plate", icon: "square.stack", destination: .notBuilt),
+            AdminSection(title: "Reports", icon: "flag", destination: .notBuilt),
         ]
         guard access.isFullAdmin else { return moderation }
         return [
-            AdminSection(title: "Products", icon: "cube.box"),
-            AdminSection(title: "Orders", icon: "shippingbox"),
-            AdminSection(title: "Catalog Options", icon: "paintpalette"),
-            AdminSection(title: "Printers", icon: "printer"),
-            AdminSection(title: "Site Settings", icon: "gearshape"),
-            AdminSection(title: "Order Issues", icon: "exclamationmark.triangle"),
-            AdminSection(title: "Build Requests", icon: "hammer"),
-            AdminSection(title: "Support Inbox", icon: "envelope"),
-            AdminSection(title: "Filament Colors", icon: "paintbrush"),
-            AdminSection(title: "User Roles", icon: "person.2.badge.gearshape"),
+            AdminSection(title: "Products", icon: "cube.box", destination: .products),
+            AdminSection(title: "Orders", icon: "shippingbox", destination: .orders),
+            AdminSection(title: "Catalog Options", icon: "paintpalette", destination: .notBuilt),
+            AdminSection(title: "Printers", icon: "printer", destination: .notBuilt),
+            AdminSection(title: "Site Settings", icon: "gearshape", destination: .notBuilt),
+            AdminSection(title: "Order Issues", icon: "exclamationmark.triangle", destination: .notBuilt),
+            AdminSection(title: "Build Requests", icon: "hammer", destination: .notBuilt),
+            AdminSection(title: "Support Inbox", icon: "envelope", destination: .notBuilt),
+            AdminSection(title: "Filament Colors", icon: "paintbrush", destination: .notBuilt),
+            AdminSection(title: "User Roles", icon: "person.2.badge.gearshape", destination: .notBuilt),
         ] + moderation
     }
 
@@ -38,22 +43,44 @@ struct AdminHomeView: View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 ForEach(sections) { section in
-                    HStack {
-                        Label(section.title, systemImage: section.icon)
-                            .font(.headline)
-                        Spacer()
-                        Text("Not built yet")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.vertical, 14)
-                    .padding(.horizontal, 16)
-                    .glassEffect(in: RoundedRectangle(cornerRadius: 18))
-                    .opacity(0.65)
+                    sectionCard(section)
                 }
             }
             .padding()
         }
         .navigationTitle(access.isFullAdmin ? "Admin" : "Moderator")
+    }
+
+    @ViewBuilder
+    private func sectionCard(_ section: AdminSection) -> some View {
+        switch section.destination {
+        case .products:
+            NavigationLink { AdminProductsView() } label: { cardLabel(section, built: true) }
+        case .orders:
+            NavigationLink { AdminOrdersView() } label: { cardLabel(section, built: true) }
+        case .notBuilt:
+            cardLabel(section, built: false)
+        }
+    }
+
+    private func cardLabel(_ section: AdminSection, built: Bool) -> some View {
+        HStack {
+            Label(section.title, systemImage: section.icon)
+                .font(.headline)
+            Spacer()
+            if built {
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("Not built yet")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 14)
+        .padding(.horizontal, 16)
+        .glassEffect(in: RoundedRectangle(cornerRadius: 18))
+        .opacity(built ? 1 : 0.65)
     }
 }

@@ -22,4 +22,39 @@ enum ProductService {
         )
         return try await Amplify.API.query(request: request).get()
     }
+
+    // MARK: - Admin
+
+    static func createProduct(_ fields: [String: Any]) async throws -> Product {
+        let request = GraphQLRequest<Product>(
+            document: GraphQLDocuments.createProduct,
+            variables: ["input": fields],
+            responseType: Product.self,
+            decodePath: "createProduct"
+        )
+        return try await Amplify.API.mutate(request: request).get()
+    }
+
+    @discardableResult
+    static func updateProduct(id: String, updates: [String: Any]) async throws -> Product {
+        var input = updates
+        input["id"] = id
+        let request = GraphQLRequest<Product>(
+            document: GraphQLDocuments.updateProduct,
+            variables: ["input": input],
+            responseType: Product.self,
+            decodePath: "updateProduct"
+        )
+        return try await Amplify.API.mutate(request: request).get()
+    }
+
+    static func deleteProduct(id: String) async throws {
+        let request = GraphQLRequest<Product?>(
+            document: GraphQLDocuments.deleteProduct,
+            variables: ["input": ["id": id]],
+            responseType: Product?.self,
+            decodePath: "deleteProduct"
+        )
+        _ = try await Amplify.API.mutate(request: request).get()
+    }
 }

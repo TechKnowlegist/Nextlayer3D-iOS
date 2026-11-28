@@ -113,4 +113,38 @@ enum OrderService {
         let data = try JSONEncoder().encode(value)
         return String(data: data, encoding: .utf8) ?? "[]"
     }
+
+    // MARK: - Admin
+
+    static func listAllOrders() async throws -> [Order] {
+        let request = GraphQLRequest<ModelConnection<Order>>(
+            document: GraphQLDocuments.listAllOrders,
+            responseType: ModelConnection<Order>.self,
+            decodePath: "listOrders"
+        )
+        let connection = try await Amplify.API.query(request: request).get()
+        return connection.items.sorted { ($0.createdAt ?? "") > ($1.createdAt ?? "") }
+    }
+
+    /// `updates` is a loose dictionary (matching the website's own
+    /// `updateOrder(id, updates)`, which just spreads whatever fields it's
+    /// given) rather than a rigid parameter list, since admin can update
+    /// any single field (paid, status, progressPhotoKeys, …) independently.
+    @discardableResult
+    static func updateOrder(id: String, updates: [String: Any]) async throws -> Order {
+        var input = updates
+        input["id"] = id
+        let request = GraphQLRequest<Order>(
+            document: GraphQLDocuments.updateOrder,
+            variables: ["input": input],
+            responseType: Order.self,
+            decodePath: "updateOrder"
+        )
+        return try await Amplify.API.mutate(request: request).get()
+    }
+
+    static func uploadProgressPhoto(orderId: String, data: Data) async throws -> String {
+        let key = "progress-photos/\(orderId)/\(UUID().uuidString).jpg"
+        return try await Amplify.Storage.uploadData(path: .fromString(key), data: data).value
+    }
 }

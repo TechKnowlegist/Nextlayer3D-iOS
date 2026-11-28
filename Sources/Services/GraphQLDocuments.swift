@@ -133,6 +133,74 @@ enum GraphQLDocuments {
         """
     }
 
+    // MARK: - Order (admin)
+
+    static var listAllOrders: String {
+        """
+        query ListAllOrders {
+          listOrders {
+            items {
+              \(orderFields)
+            }
+            nextToken
+          }
+        }
+        """
+    }
+
+    static var updateOrder: String {
+        """
+        mutation UpdateOrder($input: UpdateOrderInput!) {
+          updateOrder(input: $input) {
+            \(orderFields)
+          }
+        }
+        """
+    }
+
+    // MARK: - Product (admin)
+
+    static let productFields = """
+    id
+    name
+    description
+    price
+    category
+    rating
+    icon
+    image
+    stock
+    isSamplePack
+    """
+
+    static var createProduct: String {
+        """
+        mutation CreateProduct($input: CreateProductInput!) {
+          createProduct(input: $input) {
+            \(productFields)
+          }
+        }
+        """
+    }
+
+    static var updateProduct: String {
+        """
+        mutation UpdateProduct($input: UpdateProductInput!) {
+          updateProduct(input: $input) {
+            \(productFields)
+          }
+        }
+        """
+    }
+
+    static let deleteProduct = """
+    mutation DeleteProduct($input: DeleteProductInput!) {
+      deleteProduct(input: $input) {
+        id
+      }
+    }
+    """
+
     // MARK: - Address (owner-scoped)
 
     static let addressFields = """
