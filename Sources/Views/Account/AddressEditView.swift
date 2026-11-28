@@ -55,7 +55,7 @@ struct AddressEditView: View {
             dismiss()
         } catch {
             print("Nextlayer3D — failed to save address: \(error)")
-            errorMessage = error.localizedDescription
+            errorMessage = error.nextlayerDisplayMessage
         }
         isSaving = false
     }

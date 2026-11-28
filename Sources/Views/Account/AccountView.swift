@@ -70,7 +70,7 @@ private struct SignedInAccountView: View {
             errorMessage = nil
         } catch {
             print("Nextlayer3D — failed to load addresses: \(error)")
-            errorMessage = error.localizedDescription
+            errorMessage = error.nextlayerDisplayMessage
         }
         isLoading = false
     }

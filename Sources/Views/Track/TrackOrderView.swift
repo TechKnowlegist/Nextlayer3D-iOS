@@ -60,7 +60,7 @@ struct TrackOrderView: View {
             order = found
         } catch {
             print("Nextlayer3D — track order failed: \(error)")
-            errorMessage = error.localizedDescription
+            errorMessage = error.nextlayerDisplayMessage
         }
         isLoading = false
     }

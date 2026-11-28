@@ -89,7 +89,7 @@ struct AuthView: View {
             }
         } catch {
             print("Nextlayer3D — auth error: \(error)")
-            errorMessage = error.localizedDescription
+            errorMessage = error.nextlayerDisplayMessage
         }
     }
 }

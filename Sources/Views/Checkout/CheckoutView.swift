@@ -80,7 +80,7 @@ struct CheckoutView: View {
             paymentSheet = PaymentSheet(paymentIntentClientSecret: clientSecret, configuration: configuration)
         } catch {
             print("Nextlayer3D — failed to prepare payment: \(error)")
-            errorMessage = "Couldn't start checkout: \(error.localizedDescription)"
+            errorMessage = "Couldn't start checkout: \(error.nextlayerDisplayMessage)"
         }
     }
 
@@ -92,7 +92,7 @@ struct CheckoutView: View {
             break
         case .failed(let error):
             print("Nextlayer3D — payment failed: \(error)")
-            errorMessage = "Payment failed: \(error.localizedDescription)"
+            errorMessage = "Payment failed: \(error.nextlayerDisplayMessage)"
         }
     }
 
@@ -125,7 +125,7 @@ struct CheckoutView: View {
             placedOrder = order
         } catch {
             print("Nextlayer3D — failed to create order after payment: \(error)")
-            errorMessage = "Payment succeeded but we couldn't save your order — contact support with this: \(error.localizedDescription)"
+            errorMessage = "Payment succeeded but we couldn't save your order — contact support with this: \(error.nextlayerDisplayMessage)"
         }
     }
 }

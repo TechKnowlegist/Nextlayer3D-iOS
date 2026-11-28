@@ -42,7 +42,7 @@ struct ProductListView: View {
             errorMessage = nil
         } catch {
             print("Nextlayer3D — failed to load products: \(error)")
-            errorMessage = error.localizedDescription
+            errorMessage = error.nextlayerDisplayMessage
         }
         isLoading = false
     }
