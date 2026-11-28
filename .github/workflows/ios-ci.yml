@@ -15,8 +15,13 @@ jobs:
     # macos-14's own default Xcode turned out to be 15.4, which can't read
     # the pbxproj format brew's always-latest XcodeGen writes ("future
     # Xcode project file format (77)" — hit on two prior runs). macos-15
-    # ships a newer Xcode by default, which is a better match for that.
-    runs-on: macos-15
+    # fixed that, but only ships Xcode up to 26.3 — and an app built with
+    # Xcode 26's SDK gets locked into a small fixed-size "compatibility
+    # mode" window on a device running iOS 27+ (confirmed by an Apple DTS
+    # engineer on the developer forums; it's tied purely to the SDK the
+    # app was built with, no Info.plist key controls it). xcode-27 is the
+    # GitHub-hosted image that actually ships Xcode 27.
+    runs-on: xcode-27
     steps:
       - uses: actions/checkout@v4
 
@@ -105,7 +110,7 @@ jobs:
   # AltStore "source" JSON are published to a rolling "latest" GitHub
   # Release, so AltStore on your phone can see new builds as they land.
   build-device-ipa:
-    runs-on: macos-15
+    runs-on: xcode-27
     steps:
       - uses: actions/checkout@v4
 
