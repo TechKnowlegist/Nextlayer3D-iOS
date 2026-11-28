@@ -31,6 +31,11 @@ private struct SignedInAccountView: View {
             }
 
             Section {
+                if let email = session.email {
+                    NavigationLink("Order History") {
+                        OrderHistoryView(email: email)
+                    }
+                }
                 NavigationLink("Track an Order") {
                     TrackOrderView()
                 }

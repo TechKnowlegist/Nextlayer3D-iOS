@@ -5,6 +5,7 @@ struct ProductListView: View {
     @State private var isLoading = true
     @State private var errorMessage: String?
     @State private var search = ""
+    @State private var showingCustomOrder = false
 
     private var filtered: [Product] {
         guard !search.isEmpty else { return products }
@@ -30,6 +31,21 @@ struct ProductListView: View {
         .navigationTitle("Pre-Built")
         .navigationDestination(for: Product.self) { product in
             ProductDetailView(product: product)
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showingCustomOrder = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+                .buttonStyle(.glassProminent)
+            }
+        }
+        .sheet(isPresented: $showingCustomOrder) {
+            NavigationStack {
+                CreateCustomOrderView()
+            }
         }
         .task { await load() }
         .refreshable { await load() }

@@ -61,7 +61,7 @@ enum OrderService {
         shippingAddress: ShippingAddress?
     ) async throws -> Order {
         let lineItems = items.map { item in
-            OrderItem(productId: item.productId, name: item.name, price: item.price, quantity: item.quantity, image: item.image, icon: item.icon)
+            OrderItem(productId: item.productId, name: item.name, price: item.price, quantity: item.quantity, image: item.image, icon: item.icon, isCustom: item.isCustom, description: item.description)
         }
         let itemsJSON = try encodeJSONString(lineItems)
         let addressJSON = shippingAddress.flatMap { try? encodeJSONString($0) }

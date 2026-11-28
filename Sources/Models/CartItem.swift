@@ -10,6 +10,8 @@ struct CartItem: Identifiable, Equatable {
     let image: String?
     let icon: String?
     var quantity: Int
+    var isCustom: Bool = false
+    var description: String? = nil
 
     var lineTotal: Double {
         price * Double(quantity)

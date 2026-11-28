@@ -46,6 +46,39 @@ enum GraphQLDocuments {
     }
     """
 
+    // MARK: - GalleryPost ("Build Plate" / Feed)
+
+    static let galleryPostFields = """
+    id
+    postType
+    title
+    image
+    caption
+    authorEmail
+    authorUsername
+    likes
+    shapes
+    modelFileKey
+    modelFileType
+    remixOf
+    challengeEntry
+    aiGenerated
+    createdAt
+    """
+
+    static var listGalleryPosts: String {
+        """
+        query ListGalleryPosts {
+          listGalleryPosts {
+            items {
+              \(galleryPostFields)
+            }
+            nextToken
+          }
+        }
+        """
+    }
+
     // MARK: - Order
 
     static let orderFields = """

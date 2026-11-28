@@ -20,6 +20,15 @@ final class CartStore: ObservableObject {
         }
     }
 
+    // Matches the website's Custom "Describe" flow: a $0 placeholder item
+    // (no real catalog product behind it) that goes through the exact same
+    // checkout/Order path as anything else. We'll follow up with a real
+    // quote before anything is charged, same as the website.
+    func addCustomItem(name: String, description: String) {
+        let productId = "custom-\(UUID().uuidString)"
+        items.append(CartItem(productId: productId, name: name, price: 0, image: nil, icon: "🎨", quantity: 1, isCustom: true, description: description))
+    }
+
     func updateQuantity(productId: String, quantity: Int) {
         guard let index = items.firstIndex(where: { $0.productId == productId }) else { return }
         if quantity <= 0 {

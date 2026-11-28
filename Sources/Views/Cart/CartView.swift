@@ -13,7 +13,13 @@ struct CartView: View {
                         HStack {
                             VStack(alignment: .leading) {
                                 Text(item.name).font(.headline)
-                                Text(String(format: "$%.2f × %d", item.price, item.quantity))
+                                if item.isCustom, let description = item.description {
+                                    Text(description)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(2)
+                                }
+                                Text(item.isCustom ? "Quote pending" : String(format: "$%.2f × %d", item.price, item.quantity))
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                             }

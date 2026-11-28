@@ -38,6 +38,10 @@ struct OrderItem: Codable, Equatable, Identifiable {
     let quantity: Int
     let image: String?
     let icon: String?
+    let isCustom: Bool?
+    let description: String?
+
+    var isCustomItem: Bool { isCustom ?? false }
 }
 
 struct ShippingAddress: Codable, Equatable {
