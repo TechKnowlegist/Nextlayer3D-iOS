@@ -20,6 +20,7 @@ private struct SignedInAccountView: View {
     @State private var addresses: [Address] = []
     @State private var isLoading = true
     @State private var errorMessage: String?
+    @State private var adminAccess: AdminAccess = .none
 
     var body: some View {
         List {
@@ -27,6 +28,14 @@ private struct SignedInAccountView: View {
                 Text(session.email ?? "Signed in")
                 Button("Sign Out", role: .destructive) {
                     Task { await session.signOut() }
+                }
+            }
+
+            if adminAccess.isFullAdmin || adminAccess.isModeratorOnly {
+                Section {
+                    NavigationLink("Admin") {
+                        AdminHomeView(access: adminAccess)
+                    }
                 }
             }
 
@@ -65,6 +74,7 @@ private struct SignedInAccountView: View {
             }
         }
         .task { await load() }
+        .task { adminAccess = await AdminAccessService.checkAccess(email: session.email) }
         .refreshable { await load() }
     }
 

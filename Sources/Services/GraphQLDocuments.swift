@@ -187,6 +187,31 @@ enum GraphQLDocuments {
     }
     """
 
+    // MARK: - Admin access
+
+    static let adminUsersByEmail = """
+    query AdminUsersByEmail($email: String!) {
+      listAdminUsers(filter: { email: { eq: $email } }) {
+        items {
+          id
+          email
+        }
+      }
+    }
+    """
+
+    static let listUserRoles = """
+    query ListUserRoles {
+      listUserRoles {
+        items {
+          id
+          email
+          role
+        }
+      }
+    }
+    """
+
     // MARK: - Custom mutations (backed by Amplify Functions)
 
     static let createPaymentIntent = """
